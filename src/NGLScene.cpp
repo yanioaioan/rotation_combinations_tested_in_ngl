@@ -21,7 +21,7 @@ const static float INCREMENT=0.01;
 //----------------------------------------------------------------------------------------------------------------------
 const static float ZOOM=0.1;
 
-NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
+NGLScene::NGLScene()
 {
   // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
   m_rotate=false;
@@ -37,28 +37,24 @@ NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
 
 NGLScene::~NGLScene()
 {
-  ngl::NGLInit *Init = ngl::NGLInit::instance();
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
+
 //  Init->NGLQuit();
+
   m_vao->removeVOA();
 }
 
-void NGLScene::resizeEvent(QResizeEvent *_event )
+void NGLScene::resizeGL(int _w, int _h)
 {
-  if(isExposed())
-  {
-  int w=_event->size().width();
-  int h=_event->size().height();
   // set the viewport for openGL
-  glViewport(0,0,w,h);
+  glViewport(0,0,_w,_h);
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)w/h,0.05,350);
-  renderLater();
-  }
+  m_cam->setShape(45,(float)_w/_h,0.05,350);
+  update();
 }
 
 
-void NGLScene::initialize()
+void NGLScene::initializeGL()
 {
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
@@ -129,10 +125,11 @@ void NGLScene::initialize()
 
 void NGLScene::buildVAO()
 {
+
   ngl::Vec3 verts[]=
   {
 
-      ngl::Vec3(0,2,0.0),
+      ngl::Vec3(0,2,0),
       ngl::Vec3(1,0,0),
       ngl::Vec3(-1,0,0)
 
@@ -178,13 +175,13 @@ void NGLScene::buildVAO()
 
   // in this case we are going to set our data as the vertices above
 
-	m_vao->setData(sizeof(verts),verts[0].m_x);
-	// now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+    m_vao->setData(sizeof(verts),verts[0].m_x);
+    // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
-	m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+    m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
-	m_vao->setData(sizeof(verts),normals[0].m_x);
-	// now we set the attribute pointer to be 2 (as this matches normal in our shader)
+    m_vao->setData(sizeof(verts),normals[0].m_x);
+    // now we set the attribute pointer to be 2 (as this matches normal in our shader)
 
     m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
@@ -206,7 +203,9 @@ static int directionFlag=1;
 ngl::Mat4 translateMat=1;
 ngl::Mat4 scaleMat=1;
 ngl::Mat4 rotateMat=1;
-void NGLScene::render()
+
+
+void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -239,7 +238,7 @@ void NGLScene::render()
   ngl::Mat4 M;
 
 
-  ngl::Vec3 v1(2*cos(v1Xcoord*2),4*sin(v1Xcoord*4) ,2*sin(v1Xcoord*2));
+  ngl::Vec3 v1(2*cos(v1Xcoord*2),7*sin(v1Xcoord*4) ,2*sin(v1Xcoord*2));
   ngl::Vec3 v2(0,0.1,0);
 
   ngl::Vec3 v2NonNormalized=v2;
@@ -343,6 +342,52 @@ void NGLScene::render()
   }
 
 
+
+  //draw the tip of the triangle
+{
+  m.set(ngl::GOLD);
+  // load our material values to the shader into the structure material (see Vertex shader)
+  m.loadToShader("material");
+
+  translateMat=1;
+  rotateMat=1;
+  scaleMat=1;
+
+
+     ngl::Mat4 trs=m_transform.getMatrix();
+
+     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
+     translateMat.translate(0,2,0);
+
+
+
+//     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
+//                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
+//                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
+
+//     std::cout<<angle<<std::endl;
+
+     //place one one sphere-primitive in the tip of the triangle, but we translate first and then rotate (this effectively shows the "trajectory of the triangle rotation")
+      M=translateMat*rotateMat/**scaleMat*/;
+
+      M= M*m_mouseGlobalTX;
+      MV=  M*m_cam->getViewMatrix();
+      MVP= M*m_cam->getVPMatrix();
+      normalMatrix=MV;
+      normalMatrix.inverse();
+      shader->setShaderParamFromMat4("MV",MV);
+      shader->setShaderParamFromMat4("MVP",MVP);
+      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+      shader->setShaderParamFromMat4("M",M);
+
+      ngl::VAOPrimitives::instance()->createSphere("mysphere",0.1,10);
+
+      ngl::VAOPrimitives::instance()->draw("mysphere");
+
+}
+
+
+
 }
 
 
@@ -435,7 +480,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_spinYFace += (float) 0.5f * diffx;
     m_origX = _event->x();
     m_origY = _event->y();
-    renderLater();
+    update();
 
   }
         // right mouse translate code
@@ -447,7 +492,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_origYPos=_event->y();
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
-    renderLater();
+    update();
 
    }
 }
@@ -494,16 +539,16 @@ void NGLScene::mouseReleaseEvent ( QMouseEvent * _event )
 void NGLScene::wheelEvent(QWheelEvent *_event)
 {
 
-	// check the diff of the wheel position (0 means no change)
-	if(_event->delta() > 0)
-	{
-		m_modelPos.m_z+=ZOOM;
-	}
-	else if(_event->delta() <0 )
-	{
-		m_modelPos.m_z-=ZOOM;
-	}
-	renderLater();
+    // check the diff of the wheel position (0 means no change)
+    if(_event->delta() > 0)
+    {
+        m_modelPos.m_z+=ZOOM;
+    }
+    else if(_event->delta() <0 )
+    {
+        m_modelPos.m_z-=ZOOM;
+    }
+    update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -533,8 +578,6 @@ void NGLScene::timerEvent( QTimerEvent *_event )
             v1Xcoord+=startLerp + increment*(endLerp-startLerp);
 
 
-
-
 //            v1Xcoord+=0.1;
 
 
@@ -544,9 +587,8 @@ void NGLScene::timerEvent( QTimerEvent *_event )
             currentTime.restart();
         }
 
+        update();
 
-        //update();
-        renderNow();
     }
 }
 
@@ -570,5 +612,5 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   }
   // finally update the GLWindow and re-draw
   //if (isExposed())
-    renderLater();
+    update();
 }
