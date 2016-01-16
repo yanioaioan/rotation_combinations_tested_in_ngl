@@ -201,8 +201,12 @@ static int directionFlag=1;
 
 
 ngl::Mat4 translateMat=1;
+ngl::Mat4 translateMat2=1;
+
 ngl::Mat4 scaleMat=1;
 ngl::Mat4 rotateMat=1;
+
+static float testangle;
 
 
 void NGLScene::paintGL()
@@ -239,12 +243,15 @@ void NGLScene::paintGL()
 
 
   ngl::Vec3 v1(2*cos(v1Xcoord*2),7*sin(v1Xcoord*4) ,2*sin(v1Xcoord*2));
-  ngl::Vec3 v2(0,0.1,0);
+  ngl::Vec3 v2(testangle++/100,0.01,0);
 
   ngl::Vec3 v2NonNormalized=v2;
+  ngl::Vec3 v1NonNormalized=v1;
 
+
+  //*********At first********* STEP 1
   m_transform.reset();
-  //draw first triangle
+  //draw box
   {
 
       m_transform.setPosition(v1);
@@ -275,7 +282,12 @@ void NGLScene::paintGL()
 //  q.fromAxisAngle(rotationAxis,angle);
 
 
-  //calculate rotation vector from 2nd to 1st triangle
+
+
+
+
+  //*********NOW********* STEP 2
+  //Calculate rotation vector from 2nd to 1st triangle
   //then
 
   m.set(ngl::BRONZE);
@@ -286,7 +298,8 @@ void NGLScene::paintGL()
   m_transform.reset();
   {
 
-
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 /**************
 //not working
 //     eulerAngles.m_x = atan2( rotationAxis.m_y, rotationAxis.m_z );
@@ -310,20 +323,44 @@ void NGLScene::paintGL()
 //     toEuler(rotationAxis.m_x, rotationAxis.m_y, rotationAxis.m_z, angle);
 //     m_transform.setRotation(eulerAngles.m_x*(180/M_PI),eulerAngles.m_y*(180/M_PI),eulerAngles.m_z*(180/M_PI));
        ngl::Mat4 trs=m_transform.getMatrix();
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
 
-     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
+
+    //The following work with ngl::Transformation too, as well as with individual matrices
+    //       m_transform.reset();
+    //       if(testangle<360)
+    //           testangle++;
+    //       else
+    //       {
+    //           testangle=0;
+    //       }
+
+    //       m_transform.setRotation(testangle,0,0);
+
+    //Rotate based where v1 is (make v2NonNormalized(triangle) to point towards v1-cube)
+     rotateMat=matrixFromAxisAngle(rotationAxis,angle);//m_transform.getMatrix();
      translateMat.translate(v2NonNormalized.m_x,v2NonNormalized.m_y,v2NonNormalized.m_z);
-
 
 
 //     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
 //                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
 //                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
-
 //     std::cout<<angle<<std::endl;
 
-      M=rotateMat*translateMat/**scaleMat*/;
+
+
+
+//not quite working
+//        float norm_u_norm_v = sqrt(v1.lengthSquared() * v2.lengthSquared());
+//        ngl::Vec3 w = v1.cross(v2);
+//        ngl::Quaternion q = ngl::Quaternion(norm_u_norm_v + v1.dot(v2), w.m_x, w.m_y, w.m_z);
+//        q.normalise();
+//        rotateMat=q.toMat4();
+
+
+      M=rotateMat*translateMat;//left to right multiplication in ngl (first rotate then translate)
 
       M=/*m_transform.getMatrix()*/ M/* trs*/*m_mouseGlobalTX;
       MV=  M*m_cam->getViewMatrix();
@@ -337,27 +374,54 @@ void NGLScene::paintGL()
 
 
       m_vao->bind();
-      m_vao->draw();
+      m_vao->draw();//draw triangle now
       m_vao->unbind();
   }
 
 
+  //*********NOW********* STEP 3
 
-  //draw the tip of the triangle
+  //draw the tip-cube of the triangle
 {
   m.set(ngl::GOLD);
   // load our material values to the shader into the structure material (see Vertex shader)
   m.loadToShader("material");
 
   translateMat=1;
-  rotateMat=1;
-  scaleMat=1;
+
+//  rotateMat=1;
+//  scaleMat=1;
+
+//not working
+//  ngl::Vec3 v=v1.cross(v2);
+//  float c=v1.dot(v2);
+//  float h=1-c/v.dot(v);
+//  rotateMat=ngl::Mat4(c*h*v.m_x*v.m_x,                 h*v.m_x*v.m_y-v.m_z,           h*v.m_x*v.m_z+v.m_y, 1,
+//                      h*v.m_x*v.m_y+v.m_z,             c+h*v.m_y*v.m_y,               h*v.m_y*v.m_z-v.m_x, 1,
+//                      h*v.m_x*v.m_z-v.m_y,       h*v.m_y*v.m_z+v.m_x,                c+h*v.m_z*v.m_z,      1,
+//                      0 ,                            0 ,                                     0,            1);
+//  rotateMat.transpose();
+//not working
 
 
-     ngl::Mat4 trs=m_transform.getMatrix();
 
-     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
-     translateMat.translate(0,2,0);
+//     ngl::Mat4 trs=m_transform.getMatrix();
+//     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
+//     translateMat.translate(-v2NonNormalized.m_x,-(v2NonNormalized.m_y),-v2NonNormalized.m_z);
+
+  //Based on [R] = [T].inverse * [R0] * [T] //http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/
+  /*
+    translate the arbitrary point to the origin (subtract P which is translate by -Px,-Py,-Pz)
+    rotate about the origin (can use 3×3 matrix R0)
+    then translate back. (add P which is translate by +Px,+Py,+Pz)
+  */
+     translateMat.inverse();//step 1.. translate pointToRotate to origin
+
+     //(rotation matrix) - same as the triangle's "rotateMat" //step 2 rotate..
+
+     translateMat2.translate(v2NonNormalized.m_x,(v2NonNormalized.m_y),v2NonNormalized.m_z);//step3 ..translate pointToRotate back to its original position in 3d space
+
+     std::cout<<translateMat2.m_30<<","<<translateMat2.m_31<<","<<translateMat2.m_32<<std::endl;
 
 
 
@@ -368,7 +432,16 @@ void NGLScene::paintGL()
 //     std::cout<<angle<<std::endl;
 
      //place one one sphere-primitive in the tip of the triangle, but we translate first and then rotate (this effectively shows the "trajectory of the triangle rotation")
-      M=translateMat*rotateMat/**scaleMat*/;
+
+     /*
+      * In order to calculate the rotation about any arbitrary point we need to calculate its new rotation and translation.
+      * In other words rotation about a point is an 'proper' isometry transformation' which means that it has a linear
+      *  and a rotational component.
+      * [resulting transform] = [+Px,+Py,+Pz] * [rotation] * [-Px,-Py,-Pz]
+      */
+
+
+      M=  translateMat*rotateMat*translateMat2 /**scaleMat*/; //in ngl multiplication happens from left to right
 
       M= M*m_mouseGlobalTX;
       MV=  M*m_cam->getViewMatrix();
@@ -382,7 +455,7 @@ void NGLScene::paintGL()
 
       ngl::VAOPrimitives::instance()->createSphere("mysphere",0.1,10);
 
-      ngl::VAOPrimitives::instance()->draw("mysphere");
+      ngl::VAOPrimitives::instance()->draw("cube");
 
 }
 
