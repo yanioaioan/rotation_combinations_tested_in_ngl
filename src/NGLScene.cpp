@@ -19,7 +19,7 @@ const static float INCREMENT=0.01;
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for the wheel zoom
 //----------------------------------------------------------------------------------------------------------------------
-const static float ZOOM=0.1;
+const static float ZOOM=1;
 
 NGLScene::NGLScene()
 {
@@ -125,67 +125,110 @@ void NGLScene::initializeGL()
 
 void NGLScene::buildVAO()
 {
-
-  ngl::Vec3 verts[]=
-  {
-
-      ngl::Vec3(0,2,0),
-      ngl::Vec3(1,0,0),
-      ngl::Vec3(-1,0,0)
-
-//    ngl::Vec3(0,1,1),
-//    ngl::Vec3(0,0,-1),
-//    ngl::Vec3(-0.5,0,1),
-//    ngl::Vec3(0,1,1),
-//    ngl::Vec3(0,0,-1),
-//    ngl::Vec3(0.5,0,1),
-//    ngl::Vec3(0,1,1),
-//    ngl::Vec3(0,0,1.5),
-//    ngl::Vec3(-0.5,0,1),
-//    ngl::Vec3(0,1,1),
-//    ngl::Vec3(0,0,1.5),
-//    ngl::Vec3(0.5,0,1)
-
-  };
-
-  std::vector <ngl::Vec3> normals;
-  ngl::Vec3 n=ngl::calcNormal(verts[0],verts[1],verts[2]);
-  normals.push_back(n);
-  normals.push_back(n);
-  normals.push_back(n);
-//  n=ngl::calcNormal(verts[3],verts[4],verts[5]);
-//  normals.push_back(n);
-//  normals.push_back(n);
-//  normals.push_back(n);
-
-//  n=ngl::calcNormal(verts[6],verts[7],verts[8]);
-//  normals.push_back(n);
-//  normals.push_back(n);
-//  normals.push_back(n);
-
-//  n=ngl::calcNormal(verts[11],verts[10],verts[9]);
-//  normals.push_back(n);
-//  normals.push_back(n);
-//  normals.push_back(n);
-
-  std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
   m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
   m_vao->bind();
 
-  // in this case we are going to set our data as the vertices above
 
-    m_vao->setData(sizeof(verts),verts[0].m_x);
-    // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
-    m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+  const static GLubyte indices[]=  {
+//                                      0,1,5,0,4,5, // back
+//                                      3,2,6,7,6,3, // front
+//                                      0,1,2,3,2,0, // top
+//                                      4,5,6,7,6,4, // bottom
+//                                      0,3,4,4,7,3,
+//                                      1,5,2,2,6,5
 
-    m_vao->setData(sizeof(verts),normals[0].m_x);
-    // now we set the attribute pointer to be 2 (as this matches normal in our shader)
 
-    m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
-    m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+                      0,1,2, 2,3,0,   // first half (18 indices)
+                      0,3,4, 4,5,0,
+                      0,5,6, 6,1,0,
+
+                      1,6,7, 7,2,1,   // second half (18 indices)
+                      7,4,3, 3,2,7,
+                      4,7,6, 6,5,4
+
+                                   };
+
+
+
+
+   GLfloat vertices[] = {/*-1,1,-1,
+                         1,1,-1,
+                         1,1,1,
+                         -1,1,1,r
+                         -1,-1,-1,
+                         1,-1,-1,
+                         1,-1,1,
+                         -1,-1,1*/
+
+                         (-1.0f, -1.0f, 1.0f),//fbl 0
+                         (1.0f, -1.0f, 1.0f),//fbr 1
+                         (1.0f, 1.0f, 1.0f),//fur 2
+                         (-1.0f, 1.0f, 1.0f),//ful 3
+                         (-1.0f, -1.0f, -1.0f),//bbl 4
+                         (1.0f, -1.0f, -1.0f),//bbr 5
+                         (1.0f, 1.0f, -1.0f),//bur 6
+                         (-1.0f, 1.0f, -1.0f)//bul 7
+
+
+
+                        };
+
+
+
+   GLfloat colours[]={
+                        1,0,0,
+                        0,1,0,
+                        0,0,1,
+                        1,1,1,
+                        0,0,1,
+                        0,1,0,
+                        1,0,0,
+                        1,1,1
+                      };
+
+
+//   GLfloat normals[]={
+////                        1,0,0,
+////                        0,1,0,
+////                        0,0,1,
+////                        1,1,1,
+////                        0,0,1,
+////                        0,1,0,
+////                        1,0,0,
+////                        1,1,1
+
+
+//                    (-1.0f, -1.0f, 1.0f),
+//                    (1.0f, -1.0f, 1.0f),
+//                    (1.0f, 1.0f, 1.0f),
+//                    (-1.0f, 1.0f, 1.0f),
+//                    (-1.0f, -1.0f, -1.0f),
+//                    (1.0f, -1.0f, -1.0f),
+//                    (1.0f, 1.0f, -1.0f),
+//                    (-1.0f, 1.0f, -1.0f)
+
+
+//                      };
+
+
+
+   // in this case we are going to set our data as the vertices above
+
+   m_vao->setIndexedData(24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+   m_vao->setIndexedData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+   m_vao->setVertexAttributePointer(3,3,GL_FLOAT,0,0);
+
+//   m_vao->setIndexedData(24*sizeof(GLfloat),normals[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+//    now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+
+   m_vao->setNumIndices(sizeof(indices));
 
  // now unbind
   m_vao->unbind();
@@ -209,12 +252,59 @@ ngl::Mat4 rotateMat=1;
 static float testangle;
 
 
+ void NGLScene::toEuler(double x,double y,double z,double angle, double &heading, double &attitude, double &bank)
+ {
+    double s=sin(angle);
+    double c=cos(angle);
+    double t=1-c;
+    //  if axis is not already normalised then uncomment this
+    // double magnitude = Math.sqrt(x*x + y*y + z*z);
+    // if (magnitude==0) throw error;
+    // x /= magnitude;
+    // y /= magnitude;
+    // z /= magnitude;
+    if ((x*y*t + z*s) > 0.998) { // north pole singularity detected
+        heading = 2*atan2(x*sin(angle/2),cos(angle/2));
+        attitude = M_PI/2;
+        bank = 0;
+        return;
+    }
+    if ((x*y*t + z*s) < -0.998) { // south pole singularity detected
+        heading = -2*atan2(x*sin(angle/2),cos(angle/2));
+        attitude = -M_PI/2;
+        bank = 0;
+        return;
+    }
+    heading = atan2(y * s- x * z * t , 1 - (y*y+ z*z ) * t);
+    attitude = asin(x * y * t + z * s) ;
+    bank = atan2(x * s - y * z * t , 1 - (x*x + z*z) * t);
+}
+
+float vary=1;
 void NGLScene::paintGL()
 {
+
+    if(testangle==89)
+        vary=-1;
+
+    if(testangle==-89)
+        vary=1;
+
+    testangle+=vary;
+    std::cout<<testangle<<std::endl;
+
+    ngl::Vec3 v1(-5+15*sin((testangle)*(M_PI/180))-2,-5+15*sin((testangle)*(M_PI/180)),  4*sin((testangle)*(M_PI/180))-2);
+    ngl::Vec3 v2(-4,0.01,0);//transform the triangle vao to 2,2,0
+
+
+      ngl::Vec3 v2NonNormalized=v2;
+      ngl::Vec3 v1NonNormalized=v1;
+
+
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // Rotation based on the mouse position for our global transform
-  ngl::Transformation trans;
+
   // Rotation based on the mouse position for our global
   // transform
   ngl::Mat4 rotX;
@@ -242,19 +332,11 @@ void NGLScene::paintGL()
   ngl::Mat4 M;
 
 
-  ngl::Vec3 v1(2*cos(v1Xcoord*2),7*sin(v1Xcoord*4) ,2*sin(v1Xcoord*2));
-  ngl::Vec3 v2(testangle++/100,0.01,0);
-
-  ngl::Vec3 v2NonNormalized=v2;
-  ngl::Vec3 v1NonNormalized=v1;
-
-
-  //*********At first********* STEP 1
+  //*********
   m_transform.reset();
   //draw box
   {
-
-      m_transform.setPosition(v1);
+      m_transform.setPosition(v1NonNormalized);
       M=m_transform.getMatrix()*m_mouseGlobalTX;
       MV=  M*m_cam->getViewMatrix();
       MVP= M*m_cam->getVPMatrix();
@@ -266,198 +348,243 @@ void NGLScene::paintGL()
       shader->setShaderParamFromMat4("M",M);
 
       ngl::VAOPrimitives::instance()->draw("cube");
-
-//      m_vao->bind();
-//      m_vao->draw();
-//      m_vao->unbind();
   }
 
-  v1.normalize();
-  v2.normalize();
-  float angle = acos(v1.dot(v2));
-  ngl::Vec3 rotationAxis = v1.cross(v2);
-  rotationAxis.normalize();
 
-//  ngl::Quaternion q ;
-//  q.fromAxisAngle(rotationAxis,angle);
+    v1.normalize();
+    v2.normalize();
+    float angle = /*atan2(v1.m_y,v1.m_x) - atan2(v2.m_y,v2.m_x);//*/acos(v1.dot(v2));
+
+    ngl::Vec3 rotationAxis = v1.cross(v2);
+    rotationAxis.normalize();
+
+//    ngl::Quaternion q ;
+//    q.fromAxisAngle(rotationAxis,angle);
+
+    ngl::Mat4 s,r,t;
+    s=1;
+    r=matrixFromAxisAngle(rotationAxis,angle);//q.toMat4();
 
 
+    //calculate euler angles from axis-angle
+//    double heading,attitude,bank;
+//    toEuler(rotationAxis.m_x, rotationAxis.m_y, rotationAxis.m_z, angle, heading, attitude, bank);
 
+//    m_transform.reset();
+//    std::cout<<bank*(180/M_PI)<<","<<heading*(180/M_PI)<<","<<attitude*(180/M_PI)<<","<<std::endl;
+//    m_transform.setRotation(bank*(180/M_PI),heading*(180/M_PI),attitude*(180/M_PI));
+//    r= m_transform.getMatrix();
 
+    m_transform.reset();
+    m_transform.setPosition(v2NonNormalized);
+    t= m_transform.getMatrix();
 
+    ngl::Mat4 modelmatrix=s*r*t;
 
-  //*********NOW********* STEP 2
-  //Calculate rotation vector from 2nd to 1st triangle
-  //then
-
-  m.set(ngl::BRONZE);
-  // load our material values to the shader into the structure material (see Vertex shader)
-  m.loadToShader("material");
-
-  //... rotate and draw the 2nd triangle as well
   m_transform.reset();
+  //draw triangle
   {
+      //    load our material values to the shader into the structure material (see Vertex shader)
+      m.set(ngl::BRONZE);
+      m.loadToShader("material");
 
-//------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------
-/**************
-//not working
-//     eulerAngles.m_x = atan2( rotationAxis.m_y, rotationAxis.m_z );
-//     if (rotationAxis.m_z >= 0) {
-//        eulerAngles.m_y = -atan2( rotationAxis.m_x * cos(eulerAngles.m_x), rotationAxis.m_z );
-//     }else{
-//        eulerAngles.m_y = atan2( rotationAxis.m_x * cos(eulerAngles.m_x), -rotationAxis.m_z );
-//     }
+      M=/*m_transform.getMatrix()*/  modelmatrix*m_mouseGlobalTX;
+      MV=  M*m_cam->getViewMatrix();
+      MVP= M*m_cam->getVPMatrix();
+      normalMatrix=MV;
+      normalMatrix.inverse();
+      shader->setShaderParamFromMat4("MV",MV);
+      shader->setShaderParamFromMat4("MVP",MVP);
+      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+      shader->setShaderParamFromMat4("M",M);
 
-//     eulerAngles.m_z = atan2( cos(eulerAngles.m_x), sin(eulerAngles.m_x) * sin(eulerAngles.m_y) );
+//      ngl::VAOPrimitives::instance()->draw("cube");
+      m_vao->bind();
+      m_vao->draw();
+      m_vao->unbind();
 
-
-     //
-//     eulerAngles.m_x= 0;
-//     eulerAngles.m_y = atan2((v1-v2).m_x, (v1-v2).m_z);
-//     float padj = sqrt(pow((v1-v2).m_x, 2) + pow((v1-v2).m_z, 2));
-//     eulerAngles.m_y = atan2(padj, (v1-v2).m_y) ;
-
-  **************/
-     //convert axis anle to euler angles
-//     toEuler(rotationAxis.m_x, rotationAxis.m_y, rotationAxis.m_z, angle);
-//     m_transform.setRotation(eulerAngles.m_x*(180/M_PI),eulerAngles.m_y*(180/M_PI),eulerAngles.m_z*(180/M_PI));
-       ngl::Mat4 trs=m_transform.getMatrix();
-//------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-    //The following work with ngl::Transformation too, as well as with individual matrices
-    //       m_transform.reset();
-    //       if(testangle<360)
-    //           testangle++;
-    //       else
-    //       {
-    //           testangle=0;
-    //       }
-
-    //       m_transform.setRotation(testangle,0,0);
-
-    //Rotate based where v1 is (make v2NonNormalized(triangle) to point towards v1-cube)
-     rotateMat=matrixFromAxisAngle(rotationAxis,angle);//m_transform.getMatrix();
-     translateMat.translate(v2NonNormalized.m_x,v2NonNormalized.m_y,v2NonNormalized.m_z);
-
-
-//     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
-//                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
-//                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
-//     std::cout<<angle<<std::endl;
+   }
 
 
 
 
-//not quite working
-//        float norm_u_norm_v = sqrt(v1.lengthSquared() * v2.lengthSquared());
-//        ngl::Vec3 w = v1.cross(v2);
-//        ngl::Quaternion q = ngl::Quaternion(norm_u_norm_v + v1.dot(v2), w.m_x, w.m_y, w.m_z);
+
+//  //*********NOW********* STEP 2
+//  //Calculate rotation vector from 2nd to 1st triangle
+//  //then
+
+//  m.set(ngl::BRONZE);
+//  // load our material values to the shader into the structure material (see Vertex shader)
+//  m.loadToShader("material");
+
+//  //... rotate and draw the 2nd triangle as well
+//  m_transform.reset();
+//  {
+
+////------------------------------------------------------------------------------------------------------------------------------------
+////------------------------------------------------------------------------------------------------------------------------------------
+///**************
+////not working
+////     eulerAngles.m_x = atan2( rotationAxis.m_y, rotationAxis.m_z );
+////     if (rotationAxis.m_z >= 0) {
+////        eulerAngles.m_y = -atan2( rotationAxis.m_x * cos(eulerAngles.m_x), rotationAxis.m_z );
+////     }else{
+////        eulerAngles.m_y = atan2( rotationAxis.m_x * cos(eulerAngles.m_x), -rotationAxis.m_z );
+////     }
+
+////     eulerAngles.m_z = atan2( cos(eulerAngles.m_x), sin(eulerAngles.m_x) * sin(eulerAngles.m_y) );
+
+
+//     //
+////     eulerAngles.m_x= 0;
+////     eulerAngles.m_y = atan2((v1-v2).m_x, (v1-v2).m_z);
+////     float padj = sqrt(pow((v1-v2).m_x, 2) + pow((v1-v2).m_z, 2));
+////     eulerAngles.m_y = atan2(padj, (v1-v2).m_y) ;
+
+//  **************/
+//     //convert axis anle to euler angles
+////     toEuler(rotationAxis.m_x, rotationAxis.m_y, rotationAxis.m_z, angle);
+////     m_transform.setRotation(eulerAngles.m_x*(180/M_PI),eulerAngles.m_y*(180/M_PI),eulerAngles.m_z*(180/M_PI));
+//       ngl::Mat4 trs=m_transform.getMatrix();
+////------------------------------------------------------------------------------------------------------------------------------------
+////------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+//    //The following work with ngl::Transformation too, as well as with individual matrices
+//    //       m_transform.reset();
+//    //       if(testangle<360)
+//    //           testangle++;
+//    //       else
+//    //       {
+//    //           testangle=0;
+//    //       }
+
+//    //       m_transform.setRotation(testangle,0,0);
+
+//    //Rotate based where v1 is (make v2NonNormalized(triangle) to point towards v1-cube)
+//     rotateMat=matrixFromAxisAngle(rotationAxis,angle);//m_transform.getMatrix();
+//     translateMat.translate(v2NonNormalized.m_x,v2NonNormalized.m_y,v2NonNormalized.m_z);
+
+
+////     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
+////                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
+////                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
+////     std::cout<<angle<<std::endl;
+
+
+
+
+////not quite working
+//        float norm_u_norm_v = sqrt(v2NonNormalized.lengthSquared() * v1NonNormalized.lengthSquared());
+//        ngl::Vec3 w = v2.cross(v1);
+//        ngl::Quaternion q = ngl::Quaternion(norm_u_norm_v + v2NonNormalized.dot(v1NonNormalized), w.m_x, w.m_y, w.m_z);
 //        q.normalise();
 //        rotateMat=q.toMat4();
 
-
-      M=rotateMat*translateMat;//left to right multiplication in ngl (first rotate then translate)
-
-      M=/*m_transform.getMatrix()*/ M/* trs*/*m_mouseGlobalTX;
-      MV=  M*m_cam->getViewMatrix();
-      MVP= M*m_cam->getVPMatrix();
-      normalMatrix=MV;
-      normalMatrix.inverse();
-      shader->setShaderParamFromMat4("MV",MV);
-      shader->setShaderParamFromMat4("MVP",MVP);
-      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
-      shader->setShaderParamFromMat4("M",M);
-
-
-      m_vao->bind();
-      m_vao->draw();//draw triangle now
-      m_vao->unbind();
-  }
-
-
-  //*********NOW********* STEP 3
-
-  //draw the tip-cube of the triangle
-{
-  m.set(ngl::GOLD);
-  // load our material values to the shader into the structure material (see Vertex shader)
-  m.loadToShader("material");
-
-  translateMat=1;
-
-//  rotateMat=1;
-//  scaleMat=1;
-
-//not working
-//  ngl::Vec3 v=v1.cross(v2);
-//  float c=v1.dot(v2);
-//  float h=1-c/v.dot(v);
-//  rotateMat=ngl::Mat4(c*h*v.m_x*v.m_x,                 h*v.m_x*v.m_y-v.m_z,           h*v.m_x*v.m_z+v.m_y, 1,
-//                      h*v.m_x*v.m_y+v.m_z,             c+h*v.m_y*v.m_y,               h*v.m_y*v.m_z-v.m_x, 1,
-//                      h*v.m_x*v.m_z-v.m_y,       h*v.m_y*v.m_z+v.m_x,                c+h*v.m_z*v.m_z,      1,
-//                      0 ,                            0 ,                                     0,            1);
-//  rotateMat.transpose();
-//not working
+////not quite working either
+//     rotateMat=ngl::lookAt(v2NonNormalized,v1NonNormalized,ngl::Vec3(0,1,0));
 
 
 
-//     ngl::Mat4 trs=m_transform.getMatrix();
-//     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
-//     translateMat.translate(-v2NonNormalized.m_x,-(v2NonNormalized.m_y),-v2NonNormalized.m_z);
+//      M=rotateMat*translateMat;//left to right multiplication in ngl (first rotate then translate)
 
-  //Based on [R] = [T].inverse * [R0] * [T] //http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/
-  /*
-    translate the arbitrary point to the origin (subtract P which is translate by -Px,-Py,-Pz)
-    rotate about the origin (can use 3×3 matrix R0)
-    then translate back. (add P which is translate by +Px,+Py,+Pz)
-  */
-     translateMat.inverse();//step 1.. translate pointToRotate to origin
-
-     //(rotation matrix) - same as the triangle's "rotateMat" //step 2 rotate..
-
-     translateMat2.translate(v2NonNormalized.m_x,(v2NonNormalized.m_y),v2NonNormalized.m_z);//step3 ..translate pointToRotate back to its original position in 3d space
-
-     std::cout<<translateMat2.m_30<<","<<translateMat2.m_31<<","<<translateMat2.m_32<<std::endl;
+//      M=/*m_transform.getMatrix()*/ M/* trs*/*m_mouseGlobalTX;
+//      MV=  M*m_cam->getViewMatrix();
+//      MVP= M*m_cam->getVPMatrix();
+//      normalMatrix=MV;
+//      normalMatrix.inverse();
+//      shader->setShaderParamFromMat4("MV",MV);
+//      shader->setShaderParamFromMat4("MVP",MVP);
+//      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+//      shader->setShaderParamFromMat4("M",M);
 
 
-
-//     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
-//                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
-//                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
-
-//     std::cout<<angle<<std::endl;
-
-     //place one one sphere-primitive in the tip of the triangle, but we translate first and then rotate (this effectively shows the "trajectory of the triangle rotation")
-
-     /*
-      * In order to calculate the rotation about any arbitrary point we need to calculate its new rotation and translation.
-      * In other words rotation about a point is an 'proper' isometry transformation' which means that it has a linear
-      *  and a rotational component.
-      * [resulting transform] = [+Px,+Py,+Pz] * [rotation] * [-Px,-Py,-Pz]
-      */
+//      m_vao->bind();
+//      m_vao->draw();//draw triangle now
+//      m_vao->unbind();
+//  }
 
 
-      M=  translateMat*rotateMat*translateMat2 /**scaleMat*/; //in ngl multiplication happens from left to right
+//  //*********NOW********* STEP 3
 
-      M= M*m_mouseGlobalTX;
-      MV=  M*m_cam->getViewMatrix();
-      MVP= M*m_cam->getVPMatrix();
-      normalMatrix=MV;
-      normalMatrix.inverse();
-      shader->setShaderParamFromMat4("MV",MV);
-      shader->setShaderParamFromMat4("MVP",MVP);
-      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
-      shader->setShaderParamFromMat4("M",M);
+//  //draw the tip-cube of the triangle
+//{
+//  m.set(ngl::GOLD);
+//  // load our material values to the shader into the structure material (see Vertex shader)
+//  m.loadToShader("material");
 
-      ngl::VAOPrimitives::instance()->createSphere("mysphere",0.1,10);
+//  translateMat=1;
 
-      ngl::VAOPrimitives::instance()->draw("cube");
+////  rotateMat=1;
+////  scaleMat=1;
 
-}
+////not working
+////  ngl::Vec3 v=v1.cross(v2);
+////  float c=v1.dot(v2);
+////  float h=1-c/v.dot(v);
+////  rotateMat=ngl::Mat4(c*h*v.m_x*v.m_x,                 h*v.m_x*v.m_y-v.m_z,           h*v.m_x*v.m_z+v.m_y, 1,
+////                      h*v.m_x*v.m_y+v.m_z,             c+h*v.m_y*v.m_y,               h*v.m_y*v.m_z-v.m_x, 1,
+////                      h*v.m_x*v.m_z-v.m_y,       h*v.m_y*v.m_z+v.m_x,                c+h*v.m_z*v.m_z,      1,
+////                      0 ,                            0 ,                                     0,            1);
+////  rotateMat.transpose();
+////not working
+
+
+
+////     ngl::Mat4 trs=m_transform.getMatrix();
+////     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
+////     translateMat.translate(-v2NonNormalized.m_x,-(v2NonNormalized.m_y),-v2NonNormalized.m_z);
+
+//  //Based on [R] = [T].inverse * [R0] * [T] //http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/
+//  /*
+//    translate the arbitrary point to the origin (subtract P which is translate by -Px,-Py,-Pz)
+//    rotate about the origin (can use 3×3 matrix R0)
+//    then translate back. (add P which is translate by +Px,+Py,+Pz)
+//  */
+//     translateMat.inverse();//step 1.. translate pointToRotate to origin
+
+//     //(rotation matrix) - same as the triangle's "rotateMat" //step 2 rotate..
+
+//     translateMat2.translate(v2NonNormalized.m_x,(v2NonNormalized.m_y),v2NonNormalized.m_z);//step3 ..translate pointToRotate back to its original position in 3d space
+
+//     std::cout<<translateMat2.m_30<<","<<translateMat2.m_31<<","<<translateMat2.m_32<<std::endl;
+
+
+
+////     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
+////                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
+////                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
+
+////     std::cout<<angle<<std::endl;
+
+//     //place one one sphere-primitive in the tip of the triangle, but we translate first and then rotate (this effectively shows the "trajectory of the triangle rotation")
+
+//     /*
+//      * In order to calculate the rotation about any arbitrary point we need to calculate its new rotation and translation.
+//      * In other words rotation about a point is an 'proper' isometry transformation' which means that it has a linear
+//      *  and a rotational component.
+//      * [resulting transform] = [+Px,+Py,+Pz] * [rotation] * [-Px,-Py,-Pz]
+//      */
+
+
+//      M=  translateMat*rotateMat*translateMat2 /**scaleMat*/; //in ngl multiplication happens from left to right
+
+//      M= M*m_mouseGlobalTX;
+//      MV=  M*m_cam->getViewMatrix();
+//      MVP= M*m_cam->getVPMatrix();
+//      normalMatrix=MV;
+//      normalMatrix.inverse();
+//      shader->setShaderParamFromMat4("MV",MV);
+//      shader->setShaderParamFromMat4("MVP",MVP);
+//      shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+//      shader->setShaderParamFromMat4("M",M);
+
+//      ngl::VAOPrimitives::instance()->createSphere("mysphere",0.1,10);
+
+//      ngl::VAOPrimitives::instance()->draw("cube");
+
+//}
 
 
 

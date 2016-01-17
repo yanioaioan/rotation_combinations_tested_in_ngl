@@ -12,6 +12,10 @@ layout(location =2)in vec3 inNormal;
 /// @brief the in uv
 layout(location =1)in vec2 inUV;
 
+
+layout (location=3)in vec3 inColour;
+out vec3 vertColour;
+
 struct Materials
 {
 	vec4 ambient;
@@ -43,6 +47,7 @@ out vec3 halfVector;
 out vec3 eyeDirection;
 out vec3 vPosition;
 
+
 uniform mat4 MV;
 uniform mat4 MVP;
 uniform mat3 normalMatrix;
@@ -51,6 +56,8 @@ uniform mat4 M;
 
 void main()
 {
+    vertColour=inColour;
+
 // calculate the fragments surface normal
 fragmentNormal = (normalMatrix*inNormal);
 

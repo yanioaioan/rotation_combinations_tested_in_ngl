@@ -5,6 +5,8 @@ in vec3 fragmentNormal;
 /// @brief our output fragment colour
 layout (location =0)out vec4 fragColour;
 
+in vec3 vertColour;
+
 /// @brief material structure
 struct Materials
 {
@@ -77,6 +79,6 @@ return ambient + diffuse + specular;
 
 void main ()
 {
-		fragColour=pointLight();
+                fragColour=vec4(vertColour,1);;//pointLight();
 }
 

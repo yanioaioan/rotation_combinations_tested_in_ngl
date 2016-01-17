@@ -33,7 +33,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = Boid1.0.0
-DISTDIR = /home/yanioaioan/rotation_combinations_tested_in_ngl/obj/Boid1.0.0
+DISTDIR = /home/yanioaioan/rotation_combinations_tested_in_ngl\ (copy)/obj/Boid1.0.0
 LINK          = g++
 LFLAGS        = -m64
 LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -L/usr/local/lib -L/$(HOME)/NGL/lib -l NGL -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
@@ -262,7 +262,7 @@ compiler_moc_header_make_all: moc/moc_OpenGLWindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc/moc_OpenGLWindow.cpp
 moc/moc_OpenGLWindow.cpp: include/OpenGLWindow.h
-	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/yanioaioan/rotation_combinations_tested_in_ngl -I/home/yanioaioan/rotation_combinations_tested_in_ngl/include -I/home/yanioaioan/NGL/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/4.9 -I/usr/include/x86_64-linux-gnu/c++/4.9 -I/usr/include/c++/4.9/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/OpenGLWindow.h -o moc/moc_OpenGLWindow.cpp
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I'/home/yanioaioan/rotation_combinations_tested_in_ngl (copy)' -I'/home/yanioaioan/rotation_combinations_tested_in_ngl (copy)/include' -I/home/yanioaioan/NGL/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/4.9 -I/usr/include/x86_64-linux-gnu/c++/4.9 -I/usr/include/c++/4.9/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.9/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/OpenGLWindow.h -o moc/moc_OpenGLWindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:

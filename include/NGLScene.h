@@ -25,6 +25,9 @@
 class NGLScene : public QOpenGLWindow
 {
   public:
+
+    void toEuler(double x,double y,double z,double angle, double &heading, double &attitude, double &bank);
+
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief ctor for our NGL drawing class
     /// @param [in] parent the parent window to the class
