@@ -146,9 +146,12 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     void buildVAO();
 
+    void buildVAOLine();
+
     void toEuler(double x,double y,double z,double angle) ;
     ngl::Vec3 eulerAngles;
     ngl::Mat4 matrixFromAxisAngle(ngl::Vec3 axis, float angle) ;
+    ngl::Quaternion RotationBetweenVectors(ngl::Vec3 start, ngl::Vec3  dest);
 
     int m_sphereUpdateTimer;
     QTime currentTime;
