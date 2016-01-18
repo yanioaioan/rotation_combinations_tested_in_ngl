@@ -125,113 +125,282 @@ void NGLScene::initializeGL()
 
 void NGLScene::buildVAO()
 {
-  // create a vao as a series of GL_TRIANGLES
-  m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
-  m_vao->bind();
+//  // create a vao as a series of GL_TRIANGLES
+//  m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
+//  m_vao->bind();
 
 
 
-  const static GLubyte indices[]=  {
-//                                      0,1,5,0,4,5, // back
-//                                      3,2,6,7,6,3, // front
-//                                      0,1,2,3,2,0, // top
-//                                      4,5,6,7,6,4, // bottom
-//                                      0,3,4,4,7,3,
-//                                      1,5,2,2,6,5
+//  const static GLubyte indices[]=  {
+////                                      0,1,5,0,4,5, // back
+////                                      3,2,6,7,6,3, // front
+////                                      0,1,2,3,2,0, // top
+////                                      4,5,6,7,6,4, // bottom
+////                                      0,3,4,4,7,3,
+////                                      1,5,2,2,6,5
 
 
 
-                      0,1,2, 2,3,0,   // first half (18 indices)
-                      0,3,4, 4,5,0,
-                      0,5,6, 6,1,0,
+//                      0,1,2, 2,3,0,   // first half (18 indices)
+//                      0,3,4, 4,5,0,
+//                      0,5,6, 6,1,0,
 
-                      1,6,7, 7,2,1,   // second half (18 indices)
-                      7,4,3, 3,2,7,
-                      4,7,6, 6,5,4
+//                      1,6,7, 7,2,1,   // second half (18 indices)
+//                      7,4,3, 3,2,7,
+//                      4,7,6, 6,5,4
 
-                                   };
-
-
-
-
-   GLfloat vertices[] = {/*-1,1,-1,
-                         1,1,-1,
-                         1,1,1,
-                         -1,1,1,r
-                         -1,-1,-1,
-                         1,-1,-1,
-                         1,-1,1,
-                         -1,-1,1*/
-
-                         (-1.0f, -1.0f, 1.0f),//fbl 0
-                         (1.0f, -1.0f, 1.0f),//fbr 1
-                         (1.0f, 1.0f, 1.0f),//fur 2
-                         (-1.0f, 1.0f, 1.0f),//ful 3
-                         (-1.0f, -1.0f, -1.0f),//bbl 4
-                         (1.0f, -1.0f, -1.0f),//bbr 5
-                         (1.0f, 1.0f, -1.0f),//bur 6
-                         (-1.0f, 1.0f, -1.0f)//bul 7
+//                                   };
 
 
 
-                        };
+
+//   GLfloat vertices[] = {/*-1,1,-1,
+//                         1,1,-1,
+//                         1,1,1,
+//                         -1,1,1,r
+//                         -1,-1,-1,
+//                         1,-1,-1,
+//                         1,-1,1,
+//                         -1,-1,1*/
+
+//                         (-1.0f, -1.0f, 1.0f),//fbl 0
+//                         (1.0f, -1.0f, 1.0f),//fbr 1
+//                         (1.0f, 1.0f, 1.0f),//fur 2
+//                         (-1.0f, 1.0f, 1.0f),//ful 3
+//                         (-1.0f, -1.0f, -1.0f),//bbl 4
+//                         (1.0f, -1.0f, -1.0f),//bbr 5
+//                         (1.0f, 1.0f, -1.0f),//bur 6
+//                         (-1.0f, 1.0f, -1.0f)//bul 7
 
 
 
-   GLfloat colours[]={
-                        1,0,0,
-                        0,1,0,
-                        0,0,1,
-                        1,1,1,
-                        0,0,1,
-                        0,1,0,
-                        1,0,0,
-                        1,1,1
-                      };
+//                        };
 
 
-//   GLfloat normals[]={
-////                        1,0,0,
-////                        0,1,0,
-////                        0,0,1,
-////                        1,1,1,
-////                        0,0,1,
-////                        0,1,0,
-////                        1,0,0,
-////                        1,1,1
 
-
-//                    (-1.0f, -1.0f, 1.0f),
-//                    (1.0f, -1.0f, 1.0f),
-//                    (1.0f, 1.0f, 1.0f),
-//                    (-1.0f, 1.0f, 1.0f),
-//                    (-1.0f, -1.0f, -1.0f),
-//                    (1.0f, -1.0f, -1.0f),
-//                    (1.0f, 1.0f, -1.0f),
-//                    (-1.0f, 1.0f, -1.0f)
-
-
+//   GLfloat colours[]={
+//                        1,0,0,
+//                        0,1,0,
+//                        0,0,1,
+//                        1,1,1,
+//                        0,0,1,
+//                        0,1,0,
+//                        1,0,0,
+//                        1,1,1
 //                      };
 
 
+////   GLfloat normals[]={
+//////                        1,0,0,
+//////                        0,1,0,
+//////                        0,0,1,
+//////                        1,1,1,
+//////                        0,0,1,
+//////                        0,1,0,
+//////                        1,0,0,
+//////                        1,1,1
 
-   // in this case we are going to set our data as the vertices above
 
-   m_vao->setIndexedData(24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-   m_vao->setIndexedData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao->setVertexAttributePointer(3,3,GL_FLOAT,0,0);
+////                    (-1.0f, -1.0f, 1.0f),
+////                    (1.0f, -1.0f, 1.0f),
+////                    (1.0f, 1.0f, 1.0f),
+////                    (-1.0f, 1.0f, 1.0f),
+////                    (-1.0f, -1.0f, -1.0f),
+////                    (1.0f, -1.0f, -1.0f),
+////                    (1.0f, 1.0f, -1.0f),
+////                    (-1.0f, 1.0f, -1.0f)
 
-//   m_vao->setIndexedData(24*sizeof(GLfloat),normals[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
-//    now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-//   m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
-   m_vao->setNumIndices(sizeof(indices));
+////                      };
 
- // now unbind
-  m_vao->unbind();
+
+
+//   // in this case we are going to set our data as the vertices above
+
+//   m_vao->setIndexedData(24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+//   m_vao->setIndexedData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao->setVertexAttributePointer(3,3,GL_FLOAT,0,0);
+
+////   m_vao->setIndexedData(24*sizeof(GLfloat),normals[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW);
+////    now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+////   m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+
+//   m_vao->setNumIndices(sizeof(indices));
+
+// // now unbind
+//  m_vao->unbind();
+
+
+    ngl::Vec3 verts[]=
+     {
+//       ngl::Vec3(0,1,1),
+//       ngl::Vec3(0,0,-1),
+//       ngl::Vec3(-0.5,0,1),
+//       ngl::Vec3(0,1,1),
+//       ngl::Vec3(0,0,-1),
+//       ngl::Vec3(0.5,0,1),
+//       ngl::Vec3(0,1,1),
+//       ngl::Vec3(0,0,1.5),
+//       ngl::Vec3(-0.5,0,1),
+//       ngl::Vec3(0,1,1),
+//       ngl::Vec3(0,0,1.5),
+//       ngl::Vec3(0.5,0,1)
+
+        ////                                      0,1,5,0,4,5, // back
+        ////                                      3,2,6,7,6,3, // front
+        ////                                      0,1,2,3,2,0, // top
+        ////                                      4,5,6,7,6,4, // bottom
+        ////                                      0,3,4,4,7,3,
+        ////                                      1,5,2,2,6,5
+
+        //Create all 12 triangles separately
+        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+
+
+
+
+     };
+
+
+//     ..3 vertices for each triangle..9 coordinates*12= 108 normals total  too
+     std::vector <ngl::Vec3> normals;
+
+     //1st face normals-bottom
+     ngl::Vec3 n=ngl::calcNormal(verts[1],verts[2],verts[0]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+     n=ngl::calcNormal(verts[4],verts[3],verts[5]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //2nd face normals-top
+     n=ngl::calcNormal(verts[7],verts[6],verts[8]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[10],verts[11],verts[9]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //3rd face normals-front
+     n=ngl::calcNormal(verts[13],verts[12],verts[14]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[15],verts[16],verts[17]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //4th face normals-back
+     n=ngl::calcNormal(verts[18],verts[19],verts[20]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[20],verts[21],verts[23]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //5th face normals-left
+     n=ngl::calcNormal(verts[26],verts[25],verts[24]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[27],verts[28],verts[29]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //6th face normals-right
+     n=ngl::calcNormal(verts[31],verts[30],verts[32]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+
+     n=ngl::calcNormal(verts[35],verts[33],verts[34]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+
+
+     std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
+     // create a vao as a series of GL_TRIANGLES
+     m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
+     m_vao->bind();
+
+     // in this case we are going to set our data as the vertices above
+
+       m_vao->setData(sizeof(verts),verts[0].m_x);
+       // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+
+       m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+
+       m_vao->setData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x);
+       // now we set the attribute pointer to be 2 (as this matches normal in our shader)
+
+       m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+
+       m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+
+    // now unbind
+     m_vao->unbind();
+
 
 
 }
@@ -294,7 +463,7 @@ void NGLScene::paintGL()
     std::cout<<testangle<<std::endl;
 
     ngl::Vec3 v1(-5+15*sin((testangle)*(M_PI/180))-2,-5+15*sin((testangle)*(M_PI/180)),  4*sin((testangle)*(M_PI/180))-2);
-    ngl::Vec3 v2(-4,0.01,0);//transform the triangle vao to 2,2,0
+    ngl::Vec3 v2(-4,0.01,-5+15*sin((testangle)*(M_PI/180)));//transform the triangle vao to 2,2,0
 
 
       ngl::Vec3 v2NonNormalized=v2;
@@ -361,9 +530,9 @@ void NGLScene::paintGL()
 //    ngl::Quaternion q ;
 //    q.fromAxisAngle(rotationAxis,angle);
 
-    ngl::Mat4 s,r,t;
+    ngl::Mat4 s,rotateMat,translateMat;
     s=1;
-    r=matrixFromAxisAngle(rotationAxis,angle);//q.toMat4();
+    rotateMat=matrixFromAxisAngle(rotationAxis,angle);//q.toMat4();
 
 
     //calculate euler angles from axis-angle
@@ -377,9 +546,9 @@ void NGLScene::paintGL()
 
     m_transform.reset();
     m_transform.setPosition(v2NonNormalized);
-    t= m_transform.getMatrix();
+    translateMat= m_transform.getMatrix();
 
-    ngl::Mat4 modelmatrix=s*r*t;
+    ngl::Mat4 modelmatrix=s*rotateMat*translateMat;
 
   m_transform.reset();
   //draw triangle
@@ -404,6 +573,96 @@ void NGLScene::paintGL()
       m_vao->unbind();
 
    }
+
+
+
+    //draw the tip-cube of the triangle
+  {
+    m.set(ngl::GOLD);
+    // load our material values to the shader into the structure material (see Vertex shader)
+    m.loadToShader("material");
+
+    translateMat=1;
+
+  //  rotateMat=1;
+  //  scaleMat=1;
+
+  //not working
+  //  ngl::Vec3 v=v1.cross(v2);
+  //  float c=v1.dot(v2);
+  //  float h=1-c/v.dot(v);
+  //  rotateMat=ngl::Mat4(c*h*v.m_x*v.m_x,                 h*v.m_x*v.m_y-v.m_z,           h*v.m_x*v.m_z+v.m_y, 1,
+  //                      h*v.m_x*v.m_y+v.m_z,             c+h*v.m_y*v.m_y,               h*v.m_y*v.m_z-v.m_x, 1,
+  //                      h*v.m_x*v.m_z-v.m_y,       h*v.m_y*v.m_z+v.m_x,                c+h*v.m_z*v.m_z,      1,
+  //                      0 ,                            0 ,                                     0,            1);
+  //  rotateMat.transpose();
+  //not working
+
+
+
+  //     ngl::Mat4 trs=m_transform.getMatrix();
+  //     rotateMat=matrixFromAxisAngle(rotationAxis,angle);
+  //     translateMat.translate(-v2NonNormalized.m_x,-(v2NonNormalized.m_y),-v2NonNormalized.m_z);
+
+    //Based on [R] = [T].inverse * [R0] * [T] //http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/
+    /*
+      translate the arbitrary point to the origin (subtract P which is translate by -Px,-Py,-Pz)
+      rotate about the origin (can use 3×3 matrix R0)
+      then translate back. (add P which is translate by +Px,+Py,+Pz)
+    */
+       translateMat.inverse();//step 1.. translate pointToRotate to origin
+
+       //(rotation matrix) - same as the triangle's "rotateMat" //step 2 rotate..
+
+       translateMat2.translate(v2NonNormalized.m_x,(v2NonNormalized.m_y),v2NonNormalized.m_z);//step3 ..translate pointToRotate back to its original position in 3d space
+
+       std::cout<<translateMat2.m_30<<","<<translateMat2.m_31<<","<<translateMat2.m_32<<std::endl;
+
+
+
+  //     std::cout<<"mat Matrix():\n"<<"  "<<rotateMat.m_00<<"  "<< rotateMat.m_01<<"  "<<rotateMat.m_02 <<"  "<<rotateMat.m_03<<"  "<<
+  //                                    rotateMat.m_10<<"  "<< rotateMat.m_11<<"  "<<rotateMat.m_12 <<"  "<<rotateMat.m_13<<"  "<< rotateMat.m_20<<"  "<< rotateMat.m_21<<"  "<<rotateMat.m_22 <<"  "<<rotateMat.m_23<<"  "<< rotateMat.m_30<<"  "<<
+  //                                    rotateMat.m_31<<"  "<<rotateMat.m_32 <<"  "<<rotateMat.m_33<<"  "<<std::endl;
+
+  //     std::cout<<angle<<std::endl;
+
+       //place one one sphere-primitive in the tip of the triangle, but we translate first and then rotate (this effectively shows the "trajectory of the triangle rotation")
+
+       /*
+        * In order to calculate the rotation about any arbitrary point we need to calculate its new rotation and translation.
+        * In other words rotation about a point is an 'proper' isometry transformation' which means that it has a linear
+        *  and a rotational component.
+        * [resulting transform] = [+Px,+Py,+Pz] * [rotation] * [-Px,-Py,-Pz]
+        */
+
+
+        M=  translateMat*rotateMat*translateMat2 /**scaleMat*/; //in ngl multiplication happens from left to right
+
+        M= M*m_mouseGlobalTX;
+        MV=  M*m_cam->getViewMatrix();
+        MVP= M*m_cam->getVPMatrix();
+        normalMatrix=MV;
+        normalMatrix.inverse();
+        shader->setShaderParamFromMat4("MV",MV);
+        shader->setShaderParamFromMat4("MVP",MVP);
+        shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+        shader->setShaderParamFromMat4("M",M);
+
+//        ngl::VAOPrimitives::instance()->createSphere("mysphere",0.1,10);
+
+        ngl::VAOPrimitives::instance()->draw("cube");
+
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 
