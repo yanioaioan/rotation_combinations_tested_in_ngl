@@ -102,6 +102,7 @@ private:
 //    ngl::VertexArrayObject *m_vao;
 
     std::unique_ptr<ngl::VertexArrayObject> m_vao;
+    std::unique_ptr<ngl::VertexArrayObject> m_vao2;
     ngl::Transformation m_transform;
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -147,6 +148,7 @@ private:
     /// @brief build our VAO
     //----------------------------------------------------------------------------------------------------------------------
     void buildVAO();
+    void buildVAO2();
 
     void toEuler(double x,double y,double z,double angle) ;
     ngl::Vec3 eulerAngles;

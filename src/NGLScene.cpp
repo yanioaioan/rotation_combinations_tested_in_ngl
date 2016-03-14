@@ -39,9 +39,9 @@ NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 
-//  Init->NGLQuit();
 
   m_vao->removeVOA();
+  m_vao2->removeVOA();
 }
 
 void NGLScene::resizeGL(int _w, int _h)
@@ -119,9 +119,10 @@ void NGLScene::initializeGL()
   l.loadToShader("light");
 
   buildVAO();
+  buildVAO2();
+
   glViewport(0,0,width(),height());
 }
-
 
 void NGLScene::buildVAO()
 {
@@ -402,10 +403,164 @@ void NGLScene::buildVAO()
 
     // now unbind
      m_vao->unbind();
+}
+
+void NGLScene::buildVAO2()
+{
+
+    ngl::Vec3 verts[]=
+     {
+
+
+        //Create all 12 triangles separately
+        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+
+    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+
+
+     };
+
+
+//     ..3 vertices for each triangle..9 coordinates*12= 108 normals total  too
+     std::vector <ngl::Vec3> normals;
+
+     //1st face normals-bottom
+     ngl::Vec3 n=ngl::calcNormal(verts[1],verts[2],verts[0]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+     n=ngl::calcNormal(verts[4],verts[3],verts[5]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //2nd face normals-top
+     n=ngl::calcNormal(verts[7],verts[6],verts[8]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[10],verts[11],verts[9]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //3rd face normals-front
+     n=ngl::calcNormal(verts[13],verts[12],verts[14]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[15],verts[16],verts[17]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //4th face normals-back
+     n=ngl::calcNormal(verts[18],verts[19],verts[20]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[20],verts[21],verts[23]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //5th face normals-left
+     n=ngl::calcNormal(verts[26],verts[25],verts[24]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     n=ngl::calcNormal(verts[27],verts[28],verts[29]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+     //6th face normals-right
+     n=ngl::calcNormal(verts[31],verts[30],verts[32]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+
+     n=ngl::calcNormal(verts[35],verts[33],verts[34]);
+     normals.push_back(n);
+     normals.push_back(n);
+     normals.push_back(n);
+
+
+
+     std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
+     // create a vao as a series of GL_TRIANGLES
+     m_vao2.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
+     m_vao2->bind();
+
+     // in this case we are going to set our data as the vertices above
+
+       m_vao2->setData(sizeof(verts),verts[0].m_x);
+       // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+
+       m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+
+       m_vao2->setData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x);
+       // now we set the attribute pointer to be 2 (as this matches normal in our shader)
+
+       m_vao2->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+
+       m_vao2->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+
+    // now unbind
+     m_vao2->unbind();
 
 
 
 }
+
+
+
 static int t=0;
 static float v1Xcoord;
 const float  startLerp=0.0f;
@@ -522,7 +677,11 @@ void NGLScene::paintGL()
       shader->setShaderParamFromMat4("M",M);
 
 
-      ngl::VAOPrimitives::instance()->draw("cube");
+      //ngl::VAOPrimitives::instance()->draw("cube");
+      m_vao2->bind();
+      m_vao2->draw();
+      m_vao2->unbind();
+
   }
 
 
