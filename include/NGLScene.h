@@ -9,6 +9,7 @@
 #include <ngl/Transformation.h>
 
 #include <QOpenGLWindow>
+#include <memory>
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
 /// @brief this class inherits from the Qt OpenGLWindow and allows us to use NGL to draw OpenGL
@@ -98,8 +99,10 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief a simple light use to illuminate the screen
     //----------------------------------------------------------------------------------------------------------------------
-    ngl::VertexArrayObject *m_vao;
+//    ngl::VertexArrayObject *m_vao;
 
+    std::unique_ptr<ngl::VertexArrayObject> m_vao;
+    std::unique_ptr<ngl::VertexArrayObject> m_vao2;
     ngl::Transformation m_transform;
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -145,13 +148,13 @@ private:
     /// @brief build our VAO
     //----------------------------------------------------------------------------------------------------------------------
     void buildVAO();
-
-    void buildVAOLine();
+    void buildVAO2();
 
     void toEuler(double x,double y,double z,double angle) ;
     ngl::Vec3 eulerAngles;
     ngl::Mat4 matrixFromAxisAngle(ngl::Vec3 axis, float angle) ;
     ngl::Quaternion RotationBetweenVectors(ngl::Vec3 start, ngl::Vec3  dest);
+
 
     int m_sphereUpdateTimer;
     QTime currentTime;
