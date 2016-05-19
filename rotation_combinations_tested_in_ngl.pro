@@ -1,5 +1,5 @@
 # This specifies the exe name
-TARGET=Boid
+TARGET=rotation_combinations_tested_in_ngl
 # where to put the .o files
 OBJECTS_DIR=obj
 # core Qt Libs to use add more here if needed.
