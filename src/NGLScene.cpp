@@ -11,6 +11,8 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/Quaternion.h>
 
+#include <ngl/VAOFactory.h>
+#include <ngl/SimpleIndexVAO.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for x/y translation with mouse movement
@@ -40,8 +42,8 @@ NGLScene::~NGLScene()
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 
 
-  m_vao->removeVOA();
-  m_vao2->removeVOA();
+  m_vao->removeVAO();
+  m_vao2->removeVAO();
 }
 
 void NGLScene::resizeGL(int _w, int _h)
@@ -102,6 +104,33 @@ void NGLScene::initializeGL()
   shader->linkProgramObject("Phong");
   // and make it active ready to load values
   (*shader)["Phong"]->use();
+
+
+
+
+  shader->createShaderProgram("Colour");
+  // now we are going to create empty shaders for Frag and Vert
+  shader->attachShader("ColourVertex",ngl::ShaderType::VERTEX);
+  shader->attachShader("ColourFragment",ngl::ShaderType::FRAGMENT);
+  // attach the source
+  shader->loadShaderSource("ColourVertex","shaders/ColourVertex.glsl");
+  shader->loadShaderSource("ColourFragment","shaders/ColourFragment.glsl");
+  // compile the shaders
+  shader->compileShader("ColourVertex");
+  shader->compileShader("ColourFragment");
+  // add them to the program
+  shader->attachShaderToProgram("Colour","ColourVertex");
+  shader->attachShaderToProgram("Colour","ColourFragment");
+
+  // now we have associated this data we can link the shader
+  shader->linkProgramObject("Colour");
+  // and make it active ready to load values
+  (*shader)["Phong"]->use();
+
+  //  (*shader)["Colour"]->use();
+
+
+
   // the shader will use the currently active material and light0 so set them
   ngl::Material m(ngl::STDMAT::GOLD);
   // load our material values to the shader into the structure material (see Vertex shader)
@@ -233,6 +262,17 @@ void NGLScene::buildVAO()
 
 // // now unbind
 //  m_vao->unbind();
+
+
+      const static GLubyte indices[]=  {
+                                          0,1,5,0,4,5, // back
+                                          3,2,6,7,6,3, // front
+                                          0,1,2,3,2,0, // top
+                                          4,5,6,7,6,4, // bottom
+                                          0,3,4,4,7,3,
+                                          1,5,2,2,6,5
+                                       };
+
 
 
     ngl::Vec3 verts[]=
@@ -383,179 +423,304 @@ void NGLScene::buildVAO()
      std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
      // create a vao as a series of GL_TRIANGLES
 //     m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
-     m_vao.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
+//     m_vao.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
+
+     m_vao.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
      m_vao->bind();
 
      // in this case we are going to set our data as the vertices above
 
-       m_vao->setData(sizeof(verts),verts[0].m_x);
+
+
+     //   m_vao->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+     //   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+     //   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+     //   m_vao->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+     //   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+     //   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
+     //   m_vao->setNumIndices(sizeof(indices));
+     // // now unbind
+     //  m_vao->unbind();
+
+
+       m_vao->setData(ngl::SimpleIndexVAO::VertexData(36*sizeof(ngl::Vec3),verts[0].m_x,sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
        // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
        m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
-       m_vao->setData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x);
+       m_vao->setData(ngl::SimpleIndexVAO::VertexData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x,sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
        // now we set the attribute pointer to be 2 (as this matches normal in our shader)
 
        m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
 
-       m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+//       m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+       m_vao->setNumIndices(sizeof(indices));
 
     // now unbind
      m_vao->unbind();
 }
 
+
+
+//void NGLScene::buildVAO()
+//{
+//  // create a vao as a series of GL_TRIANGLES
+//  m_vao.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+//  m_vao->bind();
+
+
+//  const static GLubyte indices[]=  {
+//                                      0,1,5,0,4,5, // back
+//                                      3,2,6,7,6,3, // front
+//                                      0,1,2,3,2,0, // top
+//                                      4,5,6,7,6,4, // bottom
+//                                      0,3,4,4,7,3,
+//                                      1,5,2,2,6,5
+//                                   };
+
+//   GLfloat vertices[] = {-1,1,-1,
+//                         1,1,-1,
+//                         1,1,1,
+//                         -1,1,1,
+//                         -1,-1,-1,
+//                         1,-1,-1,
+//                         1,-1,1,
+//                         -1,-1,1
+//                        };
+
+//   GLfloat colours[]={
+//                        1,0,0,
+//                        0,1,0,
+//                        0,0,1,
+//                        1,1,1,
+//                        0,0,1,
+//                        0,1,0,
+//                        1,0,0,
+//                        1,1,1
+//                      };
+//   // in this case we are going to set our data as the vertices above
+
+//   GLuint buffer;
+//   glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, buffer);
+
+
+//   m_vao->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+//   m_vao->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
+//   m_vao->setNumIndices(sizeof(indices));
+// // now unbind
+//  m_vao->unbind();
+
+//}
+
+
+//void NGLScene::buildVAO2()
+//{
+
+//    ngl::Vec3 verts[]=
+//     {
+
+
+//        //Create all 12 triangles separately
+//        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
+
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+
+
+//     };
+
+
+////     ..3 vertices for each triangle..9 coordinates*12= 108 normals total  too
+//     std::vector <ngl::Vec3> normals;
+
+//     //1st face normals-bottom
+//     ngl::Vec3 n=ngl::calcNormal(verts[1],verts[2],verts[0]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     n=ngl::calcNormal(verts[4],verts[3],verts[5]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     //2nd face normals-top
+//     n=ngl::calcNormal(verts[7],verts[6],verts[8]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     n=ngl::calcNormal(verts[10],verts[11],verts[9]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     //3rd face normals-front
+//     n=ngl::calcNormal(verts[13],verts[12],verts[14]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     n=ngl::calcNormal(verts[15],verts[16],verts[17]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     //4th face normals-back
+//     n=ngl::calcNormal(verts[18],verts[19],verts[20]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     n=ngl::calcNormal(verts[20],verts[21],verts[23]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     //5th face normals-left
+//     n=ngl::calcNormal(verts[26],verts[25],verts[24]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     n=ngl::calcNormal(verts[27],verts[28],verts[29]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+//     //6th face normals-right
+//     n=ngl::calcNormal(verts[31],verts[30],verts[32]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+
+//     n=ngl::calcNormal(verts[35],verts[33],verts[34]);
+//     normals.push_back(n);
+//     normals.push_back(n);
+//     normals.push_back(n);
+
+
+
+//     std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
+//     // create a vao as a series of GL_TRIANGLES
+//     m_vao2.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
+//     m_vao2->bind();
+
+//     // in this case we are going to set our data as the vertices above
+
+//       m_vao2->setData(sizeof(verts),verts[0].m_x);
+//       // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+
+//       m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+
+//       m_vao2->setData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x);
+//       // now we set the attribute pointer to be 2 (as this matches normal in our shader)
+
+//       m_vao2->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+
+//       m_vao2->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+
+//    // now unbind
+//     m_vao2->unbind();
+
+
+
+//}
+
+
+
 void NGLScene::buildVAO2()
 {
-
-    ngl::Vec3 verts[]=
-     {
-
-
-        //Create all 12 triangles separately
-        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
-
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+  // create a vao as a series of GL_TRIANGLES
+  m_vao2.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+  m_vao2->bind();
 
 
+  const static GLubyte indices[]=  {
+                                      0,1,5,0,4,5, // back
+                                      3,2,6,7,6,3, // front
+                                      0,1,2,3,2,0, // top
+                                      4,5,6,7,6,4, // bottom
+                                      0,3,4,4,7,3,
+                                      1,5,2,2,6,5
+                                   };
 
-     };
+   GLfloat vertices[] = {-1,1,-1,
+                         1,1,-1,
+                         1,1,1,
+                         -1,1,1,
+                         -1,-1,-1,
+                         1,-1,-1,
+                         1,-1,1,
+                         -1,-1,1
+                        };
 
+   GLfloat colours[]={
+                        1,0,0,
+                        0,1,0,
+                        0,0,1,
+                        1,1,1,
+                        0,0,1,
+                        0,1,0,
+                        1,0,0,
+                        1,1,1
+                      };
+   // in this case we are going to set our data as the vertices above
 
-//     ..3 vertices for each triangle..9 coordinates*12= 108 normals total  too
-     std::vector <ngl::Vec3> normals;
-
-     //1st face normals-bottom
-     ngl::Vec3 n=ngl::calcNormal(verts[1],verts[2],verts[0]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-     n=ngl::calcNormal(verts[4],verts[3],verts[5]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     //2nd face normals-top
-     n=ngl::calcNormal(verts[7],verts[6],verts[8]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     n=ngl::calcNormal(verts[10],verts[11],verts[9]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     //3rd face normals-front
-     n=ngl::calcNormal(verts[13],verts[12],verts[14]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     n=ngl::calcNormal(verts[15],verts[16],verts[17]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     //4th face normals-back
-     n=ngl::calcNormal(verts[18],verts[19],verts[20]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     n=ngl::calcNormal(verts[20],verts[21],verts[23]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     //5th face normals-left
-     n=ngl::calcNormal(verts[26],verts[25],verts[24]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     n=ngl::calcNormal(verts[27],verts[28],verts[29]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-     //6th face normals-right
-     n=ngl::calcNormal(verts[31],verts[30],verts[32]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-
-     n=ngl::calcNormal(verts[35],verts[33],verts[34]);
-     normals.push_back(n);
-     normals.push_back(n);
-     normals.push_back(n);
-
-
-
-     std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
-     // create a vao as a series of GL_TRIANGLES
-     m_vao2.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
-     m_vao2->bind();
-
-     // in this case we are going to set our data as the vertices above
-
-       m_vao2->setData(sizeof(verts),verts[0].m_x);
-       // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-
-       m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-
-       m_vao2->setData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x);
-       // now we set the attribute pointer to be 2 (as this matches normal in our shader)
-
-       m_vao2->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
-
-       m_vao2->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
-
-    // now unbind
-     m_vao2->unbind();
-
-
+   m_vao2->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+   m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+   m_vao2->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+   m_vao2->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
+   m_vao2->setNumIndices(sizeof(indices));
+ // now unbind
+  m_vao2->unbind();
 
 }
 
@@ -752,6 +917,8 @@ void NGLScene::paintGL()
 
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   (*shader)["Phong"]->use();
+//  (*shader)["Colour"]->use();
+
   ngl::Material m(ngl::STDMAT::PEWTER);
   // load our material values to the shader into the structure material (see Vertex shader)
   m.loadToShader("material");

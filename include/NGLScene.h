@@ -10,6 +10,10 @@
 
 #include <QOpenGLWindow>
 #include <memory>
+
+
+#include <ngl/AbstractVAO.h>
+
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
 /// @brief this class inherits from the Qt OpenGLWindow and allows us to use NGL to draw OpenGL
@@ -101,8 +105,11 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
 //    ngl::VertexArrayObject *m_vao;
 
-    std::unique_ptr<ngl::VertexArrayObject> m_vao;
-    std::unique_ptr<ngl::VertexArrayObject> m_vao2;
+    //std::unique_ptr<ngl::VertexArrayObject> m_vao;
+    std::unique_ptr<ngl::AbstractVAO> m_vao;
+    //std::unique_ptr<ngl::VertexArrayObject> m_vao2;
+    std::unique_ptr<ngl::AbstractVAO> m_vao2;
+
     ngl::Transformation m_transform;
 
     //----------------------------------------------------------------------------------------------------------------------
