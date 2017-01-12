@@ -12,7 +12,7 @@
 #include <ngl/Quaternion.h>
 
 #include <ngl/VAOFactory.h>
-#include <ngl/SimpleIndexVAO.h>
+#include <ngl/MultiBufferVAO.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for x/y translation with mouse movement
@@ -148,7 +148,7 @@ void NGLScene::initializeGL()
   l.loadToShader("light");
 
   buildVAO();
-  buildVAO2();
+//  buildVAO2();
 
   glViewport(0,0,width(),height());
 }
@@ -262,16 +262,6 @@ void NGLScene::buildVAO()
 
 // // now unbind
 //  m_vao->unbind();
-
-
-      const static GLubyte indices[]=  {
-                                          0,1,5,0,4,5, // back
-                                          3,2,6,7,6,3, // front
-                                          0,1,2,3,2,0, // top
-                                          4,5,6,7,6,4, // bottom
-                                          0,3,4,4,7,3,
-                                          1,5,2,2,6,5
-                                       };
 
 
 
@@ -425,7 +415,7 @@ void NGLScene::buildVAO()
 //     m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
 //     m_vao.reset(ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
 
-     m_vao.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+     m_vao.reset( ngl::VAOFactory::createVAO(ngl::multiBufferVAO,GL_TRIANGLES));
      m_vao->bind();
 
      // in this case we are going to set our data as the vertices above
@@ -443,19 +433,18 @@ void NGLScene::buildVAO()
      //  m_vao->unbind();
 
 
-       m_vao->setData(ngl::SimpleIndexVAO::VertexData(36*sizeof(ngl::Vec3),verts[0].m_x,sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+       m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts)*sizeof(ngl::Vec3),verts[0].m_x,GL_STATIC_DRAW));
        // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
        m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+       m_vao->setData(ngl::MultiBufferVAO::VertexData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x,GL_STATIC_DRAW));
 
-       m_vao->setData(ngl::SimpleIndexVAO::VertexData(normals.size()*sizeof(ngl::Vec3),normals[0].m_x,sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
        // now we set the attribute pointer to be 2 (as this matches normal in our shader)
 
        m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
 
-//       m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
-       m_vao->setNumIndices(sizeof(indices));
+       m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
 
     // now unbind
      m_vao->unbind();
@@ -674,55 +663,55 @@ void NGLScene::buildVAO()
 
 
 
-void NGLScene::buildVAO2()
-{
-  // create a vao as a series of GL_TRIANGLES
-  m_vao2.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
-  m_vao2->bind();
+//void NGLScene::buildVAO2()
+//{
+//  // create a vao as a series of GL_TRIANGLES
+//  m_vao2.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+//  m_vao2->bind();
 
 
-  const static GLubyte indices[]=  {
-                                      0,1,5,0,4,5, // back
-                                      3,2,6,7,6,3, // front
-                                      0,1,2,3,2,0, // top
-                                      4,5,6,7,6,4, // bottom
-                                      0,3,4,4,7,3,
-                                      1,5,2,2,6,5
-                                   };
+//  const static GLubyte indices[]=  {
+//                                      0,1,5,0,4,5, // back
+//                                      3,2,6,7,6,3, // front
+//                                      0,1,2,3,2,0, // top
+//                                      4,5,6,7,6,4, // bottom
+//                                      0,3,4,4,7,3,
+//                                      1,5,2,2,6,5
+//                                   };
 
-   GLfloat vertices[] = {-1,1,-1,
-                         1,1,-1,
-                         1,1,1,
-                         -1,1,1,
-                         -1,-1,-1,
-                         1,-1,-1,
-                         1,-1,1,
-                         -1,-1,1
-                        };
+//   GLfloat vertices[] = {-1,1,-1,
+//                         1,1,-1,
+//                         1,1,1,
+//                         -1,1,1,
+//                         -1,-1,-1,
+//                         1,-1,-1,
+//                         1,-1,1,
+//                         -1,-1,1
+//                        };
 
-   GLfloat colours[]={
-                        1,0,0,
-                        0,1,0,
-                        0,0,1,
-                        1,1,1,
-                        0,0,1,
-                        0,1,0,
-                        1,0,0,
-                        1,1,1
-                      };
-   // in this case we are going to set our data as the vertices above
+//   GLfloat colours[]={
+//                        1,0,0,
+//                        0,1,0,
+//                        0,0,1,
+//                        1,1,1,
+//                        0,0,1,
+//                        0,1,0,
+//                        1,0,0,
+//                        1,1,1
+//                      };
+//   // in this case we are going to set our data as the vertices above
 
-   m_vao2->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-   m_vao2->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao2->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
-   m_vao2->setNumIndices(sizeof(indices));
- // now unbind
-  m_vao2->unbind();
+//   m_vao2->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao2->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+//   m_vao2->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+//   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+//   m_vao2->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
+//   m_vao2->setNumIndices(sizeof(indices));
+// // now unbind
+//  m_vao2->unbind();
 
-}
+//}
 
 
 
@@ -946,9 +935,9 @@ void NGLScene::paintGL()
 
 
       //ngl::VAOPrimitives::instance()->draw("cube");
-      m_vao2->bind();
-      m_vao2->draw();
-      m_vao2->unbind();
+//      m_vao2->bind();
+//      m_vao2->draw();
+//      m_vao2->unbind();
 
   }
 
