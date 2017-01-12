@@ -14,6 +14,13 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/MultiBufferVAO.h>
 
+#include <string>
+#include <iterator>
+#include <iostream>
+#include <algorithm>
+#include <array>
+
+
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for x/y translation with mouse movement
 //----------------------------------------------------------------------------------------------------------------------
@@ -263,80 +270,125 @@ void NGLScene::buildVAO()
 // // now unbind
 //  m_vao->unbind();
 
+    std::array<ngl::Vec3, 36> verts =
+    {
+
+                    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+                    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+                    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+                    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+                    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+                    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+                    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+                    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+                    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+                    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+                    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+                    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+                    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+                    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+                    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+                    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+                    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+                    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+
+                    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+                    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+                    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+                    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+                    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+                    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+
+                    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+                    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+                    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+                    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+                    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+                    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+                    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+                    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+                    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+                    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+                    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+                    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
 
 
-    ngl::Vec3 verts[]=
-     {
-//       ngl::Vec3(0,1,1),
-//       ngl::Vec3(0,0,-1),
-//       ngl::Vec3(-0.5,0,1),
-//       ngl::Vec3(0,1,1),
-//       ngl::Vec3(0,0,-1),
-//       ngl::Vec3(0.5,0,1),
-//       ngl::Vec3(0,1,1),
-//       ngl::Vec3(0,0,1.5),
-//       ngl::Vec3(-0.5,0,1),
-//       ngl::Vec3(0,1,1),
-//       ngl::Vec3(0,0,1.5),
-//       ngl::Vec3(0.5,0,1)
+    };
 
-        ////                                      0,1,5,0,4,5, // back
-        ////                                      3,2,6,7,6,3, // front
-        ////                                      0,1,2,3,2,0, // top
-        ////                                      4,5,6,7,6,4, // bottom
-        ////                                      0,3,4,4,7,3,
-        ////                                      1,5,2,2,6,5
+//    ngl::Vec3 verts[]=
+//     {
+////       ngl::Vec3(0,1,1),
+////       ngl::Vec3(0,0,-1),
+////       ngl::Vec3(-0.5,0,1),
+////       ngl::Vec3(0,1,1),
+////       ngl::Vec3(0,0,-1),
+////       ngl::Vec3(0.5,0,1),
+////       ngl::Vec3(0,1,1),
+////       ngl::Vec3(0,0,1.5),
+////       ngl::Vec3(-0.5,0,1),
+////       ngl::Vec3(0,1,1),
+////       ngl::Vec3(0,0,1.5),
+////       ngl::Vec3(0.5,0,1)
 
-        //Create all 12 triangles separately
-        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
+//        ////                                      0,1,5,0,4,5, // back
+//        ////                                      3,2,6,7,6,3, // front
+//        ////                                      0,1,2,3,2,0, // top
+//        ////                                      4,5,6,7,6,4, // bottom
+//        ////                                      0,3,4,4,7,3,
+//        ////                                      1,5,2,2,6,5
 
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//        //Create all 12 triangles separately
+//        //6 faces > 12 triangles > 12*3 vertices > 12*3*(3each vertex)= 108 vertices total
 
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
 
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
 
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
 
-    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
-    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
-    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
 
-    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
-    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
-    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(-1.0f, -1.0f, 1.0f),//fbl 0
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(-1.0f, -1.0f, -1.0f),//bbl 4
+//    ngl::Vec3(-1.0f, 1.0f, -1.0f),//bul 7
+//    ngl::Vec3(-1.0f, 1.0f, 1.0f),//ful 3
+
+//    ngl::Vec3(1.0f, -1.0f, 1.0f),//fbr 1
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, 1.0f),//fur 2
+//    ngl::Vec3(1.0f, 1.0f, -1.0f),//bur 6
+//    ngl::Vec3(1.0f, -1.0f, -1.0f),//bbr 5
+
+//     };
 
 
 
-
-
-     };
 
 
 //     ..3 vertices for each triangle..9 coordinates*12= 108 normals total  too
