@@ -827,6 +827,31 @@ float vary=1;
 ngl::Vec3 v1;
 ngl::Vec3 v2;
 
+//http://immersivemath.com/forum/question/rotation-matrix-from-one-vector-to-another/
+ngl::Mat4 NGLScene::deriveRotMatrixToRotateV2toV1(ngl::Vec3 start, ngl::Vec3  dest)
+{
+//    The classical answer is that you can create an axis of rotation, a=u×v/||u×v||a=u×v/||u×v||, which is normalized, and compute the angle between uu and vv, i.e., α=arccos(u⋅v)α=arccos⁡(u⋅v). The rotation matrix is then:
+//    M=⎛⎝⎜a2x(1−c)+caxay(1−c)+sazaxaz(1−c)–sayaxay(1−c)–saza2y(1−c)+cayaz(1−c)+saxaxaz(1−c)+sayayaz(1−c)−saxa2z(1−c)+c⎞⎠⎟
+//    M=(ax2(1−c)+caxay(1−c)–sazaxaz(1−c)+sayaxay(1−c)+sazay2(1−c)+cayaz(1−c)−saxaxaz(1−c)–sayayaz(1−c)+saxaz2(1−c)+c)
+
+//    where c=cosαc=cos⁡α and s=sinαs=sin⁡α. It should be possible to show that v=Muv=Mu.
+
+
+    ngl::Vec3 axis=start.cross(dest);
+    axis.normalize();
+    float a=acos(start.dot(dest));
+    float c=cos(a);
+    float s=sin(a);
+
+    ngl::Mat4 rotMat( (axis.m_x*axis.m_x)*(1-c)+c,           (axis.m_x*axis.m_y)*(1-c)-s*axis.m_z,  (axis.m_x*axis.m_z)*(1-c)+s*axis.m_y, 0,
+                      (axis.m_x*axis.m_y)*(1-c)+s*axis.m_z,  (axis.m_y*axis.m_y)*(1-c)+c,           (axis.m_y*axis.m_z)*(1-c)-s*axis.m_x, 0,
+                      (axis.m_x*axis.m_z)*(1-c)-s*axis.m_y,  (axis.m_y*axis.m_z)*(1-c)+s*axis.m_x,  (axis.m_z*axis.m_z)*(1-c)+c, 0,
+                      0,                                         0  ,                                     0   ,                        1
+                      );
+
+    return rotMat;
+
+}
 
 //return shortest arc quaternion that rotates start to dest
  ngl::Quaternion NGLScene::RotationBetweenVectors(ngl::Vec3 start, ngl::Vec3  dest){
@@ -870,6 +895,7 @@ ngl::Vec3 v2;
 
          rotationAxis.normalize();
          q.fromAxisAngle(rotationAxis,180.0f);
+        return q;
      }
 
 
@@ -1018,9 +1044,12 @@ void NGLScene::paintGL()
     ngl::Mat4 s,rotateMat,translateMat;
     s=1;
 
-    //Use either RotationBetweenVectors or matrixFromAxisAngle
+    //Use either RotationBetweenVectors or
+    //(deriveRotMatrixToRotateV2toV1 or matrixFromAxisAngle) both the same in different form
     rotateMat=RotationBetweenVectors(v2,v1).toMat4();
-    //rotateMat=matrixFromAxisAngle(rotationAxis,angle);//q.toMat4();
+//    rotateMat=deriveRotMatrixToRotateV2toV1(v2,v1);
+
+//    rotateMat=matrixFromAxisAngle(rotationAxis,angle);//q.toMat4();
 
 
     //calculate euler angles from axis-angle
@@ -1035,6 +1064,7 @@ void NGLScene::paintGL()
     m_transform.reset();
     m_transform.setPosition(v2NonNormalized);
     translateMat= m_transform.getMatrix();
+
 
     ngl::Mat4 modelmatrix=s*rotateMat*translateMat;
 

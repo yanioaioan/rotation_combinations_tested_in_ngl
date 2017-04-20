@@ -160,6 +160,9 @@ private:
     void toEuler(double x,double y,double z,double angle) ;
     ngl::Vec3 eulerAngles;
     ngl::Mat4 matrixFromAxisAngle(ngl::Vec3 axis, float angle) ;
+
+    ngl::Mat4 deriveRotMatrixToRotateV2toV1(ngl::Vec3 start, ngl::Vec3  dest);
+
     ngl::Quaternion RotationBetweenVectors(ngl::Vec3 start, ngl::Vec3  dest);
 
 
